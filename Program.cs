@@ -15,6 +15,7 @@ namespace RenameFiles
             var excelFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Test.xlsx");
             Console.WriteLine("注意：重命名文件放置于Target文件夹中，Excel名称修改为Test.xlsx，并与此程序放置在同一目录！");
             Console.WriteLine("注意：保证表格序号为第一列，姓名为第二列！");
+            Console.WriteLine("注意：从表格第二行开始筛选，删除多余行！");
             Console.WriteLine("注意：文件准备完成后按回车键继续！");
             Console.ReadKey();
             if (!File.Exists(excelFilePath))
@@ -23,36 +24,57 @@ namespace RenameFiles
                 Console.ReadKey();
                 return;
             }
-            while (true)
+
+            Console.WriteLine("是否自定义筛选？（输入n按照默认四个工作表筛选）（y/n）");
+            var answer = Console.ReadLine();
+            if (answer == "y")
             {
-                Console.WriteLine("请输入结果文件夹名称：");
-                var resultFolderName = Console.ReadLine();
-                if (string.IsNullOrEmpty(resultFolderName))
+                while (true)
                 {
-                    resultFolderName = "Result";
+                    Console.WriteLine("请输入结果文件夹名称：");
+                    var resultFolderName = Console.ReadLine();
+                    if (string.IsNullOrEmpty(resultFolderName))
+                    {
+                        resultFolderName = "Result";
+                    }
+                    var resultFolderPath = Path.Combine(Directory.GetCurrentDirectory(), resultFolderName);
+                    if (!Directory.Exists(resultFolderPath))
+                    {
+                        Directory.CreateDirectory(resultFolderPath);
+                    }
+                    Console.WriteLine("请输入要对比的是第几个工作表（默认为1）：");
+                    var sheetIndexString = Console.ReadLine();
+                    var sheetIndex = 0;
+                    if (!string.IsNullOrEmpty(sheetIndexString))
+                    {
+                        sheetIndex = int.Parse(sheetIndexString) - 1;
+                    }
+                    RenameFilesFromExcel(excelFilePath, targetFolderPath, sheetIndex, resultFolderPath);
+                    Console.WriteLine("是否还有别的工作表需要筛选？（y/n）");
+                    var answer2 = Console.ReadLine();
+                    if (answer2 == "y")
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                var resultFolderPath = Path.Combine(Directory.GetCurrentDirectory(), resultFolderName);
-                if (!Directory.Exists(resultFolderPath))
+            }
+            else
+            {
+                List<string> resultFolderNames = new List<string> { "广东一体化", "梅州县县通", "惠州LNG", "惠州海丰" };
+                int i = 0;
+                foreach (var resultFolderName in resultFolderNames)
                 {
-                    Directory.CreateDirectory(resultFolderPath);
-                }
-                Console.WriteLine("请输入要对比的是第几个工作表（默认为1）：");
-                var sheetIndexString = Console.ReadLine();
-                var sheetIndex = 0;
-                if (!string.IsNullOrEmpty(sheetIndexString))
-                {
-                    sheetIndex = int.Parse(sheetIndexString) - 1;
-                }
-                RenameFilesFromExcel(excelFilePath, targetFolderPath, sheetIndex, resultFolderPath);
-                Console.WriteLine("是否还有别的工作表需要筛选？（y/n）");
-                var answer = Console.ReadLine();
-                if (answer == "y")
-                {
-                    continue;
-                }
-                else
-                {
-                    break;
+                    var resultFolderPath = Path.Combine(Directory.GetCurrentDirectory(), resultFolderName);
+                    if (!Directory.Exists(resultFolderPath))
+                    {
+                        Directory.CreateDirectory(resultFolderPath);
+                    }
+                    RenameFilesFromExcel(excelFilePath, targetFolderPath, i, resultFolderPath);
+                    i++;
                 }
             }
             Console.WriteLine("处理完成。");
