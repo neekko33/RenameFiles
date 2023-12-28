@@ -64,7 +64,7 @@ namespace RenameFiles
             }
             else
             {
-                List<string> resultFolderNames = new List<string> { "广东一体化", "梅州县县通", "惠州LNG", "惠州海丰" };
+                List<string> resultFolderNames = new List<string> { "工作表1", "工作表2", "工作表3", "工作表4" };
                 int i = 0;
                 foreach (var resultFolderName in resultFolderNames)
                 {
